@@ -32,12 +32,12 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 
 	# Seperate the target column
 	df_train = df.drop(target_column, axis = 1)
-	write_coll(list(df_train.columns), outputs_folder + '/input_column_names.json')
+	util.write_coll(list(df_train.columns), outputs_folder + '/input_column_names.json')
 	labels = df[target_column]
 	labels_list = list(labels.unique())
 	labels_dict = {labels_list[0]: 0, labels_list[1]: 1}
 	labels = labels.apply(lambda x: labels_dict[x])
-	write_coll(labels_dict, outputs_folder + '/labels_dict.json')
+	util.write_coll(labels_dict, outputs_folder + '/labels_dict.json')
 
 	# An example transform. Maybe some other data is needed
 	# to "enrich" the dataset. This could come from a database
@@ -62,7 +62,7 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 
 	# we store the list of selected features because we will need
 	# this when we do testing (we will select the same features)
-	write_coll(feature_selected_columns, outputs_folder + '/selected_features.txt')
+	util.write_coll(feature_selected_columns, outputs_folder + '/selected_features.txt')
 
 	# subset the features based on feature selection
 	df = df[feature_selected_columns]
@@ -88,13 +88,13 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	df['age'] = config['age_multiplier'] * df['age']
 
 	hours_info = df['hours-per-week'].describe().to_dict()
-	write_coll(hours_info, outputs_folder + '/hours_info.json')
+	util.write_coll(hours_info, outputs_folder + '/hours_info.json')
 	
 	df['hours-per-week'] = df['hours-per-week'] - hours_info['min']
 	df['hours-per-week'] = df['hours-per-week'] / (hours_info['max'] - hours_info['min'])
 
 	# OK end of featurizations - now preparing data for algorithm
-	write_coll(list(df.columns), outputs_folder + '/column_names.json')
+	util.write_coll(list(df.columns), outputs_folder + '/column_names.json')
 
 	# create the encoder object (this is an example of an ML specific transform for categorical data)
 	enc_obj = OneHotEncoder(sparse = False, handle_unknown = 'ignore')

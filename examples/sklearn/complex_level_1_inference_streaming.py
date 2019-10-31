@@ -21,14 +21,6 @@ from flask import request
 
 target_column = 'yearly-income'
 
-def util.write_coll(collection, filename):
-	with open(filename, 'w') as f:
-		f.write(json.dumps(collection, indent = 4))
-
-def util.read_coll(filename):
-	with open(filename, 'r') as f:
-		return json.load(f)
-
 if len(sys.argv) != 3:
 	print("Usage: <input folder> <ai folder>")
 	exit(1)
@@ -114,7 +106,7 @@ def main():
 if __name__ == "__main__":
 	main()
 
-
+# curl -i -H "Content-Type: application/json" -X POST -d '{"data": {"age": 39, "workclass": "State-gov", "fnlwgt": 77516, "education": "Bachelors", "education-num": 13, "marital-status": "Never-married", "occupation": "Adm-clerical", "relationship": "Not-in-family", "race": "White", "sex": "Male", "capital-gain": 2174, "capital-loss": 0, "hours-per-week": 40, "native-country": "United-States", "yearly-income": "<=50K"} }' http://localhost:5000/predict
 
 
 

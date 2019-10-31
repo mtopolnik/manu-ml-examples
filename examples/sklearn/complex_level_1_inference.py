@@ -23,11 +23,11 @@ def predict(df, inputs_folder, ai_folder):
 	labels = None
 	if target_column in df.columns:
 		labels = df[target_column]
-		labels_dict = util.util.read_coll(ai_folder + '/labels_dict.json')
+		labels_dict = util.read_coll(ai_folder + '/labels_dict.json')
 		labels = labels.apply(lambda x: labels_dict[x])
 		df = df.drop(target_column, axis = 1)
 
-	cols = util.util.read_coll(ai_folder + '/input_column_names.json')
+	cols = util.read_coll(ai_folder + '/input_column_names.json')
 	
 	if sorted(cols) != sorted(list(df.columns)):
 		print(cols)
@@ -43,7 +43,7 @@ def predict(df, inputs_folder, ai_folder):
 	df = df.merge(occupation_stats, how = 'inner', on = 'occupation')
 
 	# select only he feature selection columns
-	feature_selected_columns = util.util.read_coll(ai_folder + '/selected_features.txt')
+	feature_selected_columns = util.read_coll(ai_folder + '/selected_features.txt')
 	df = df[feature_selected_columns]
 
 
@@ -56,7 +56,7 @@ def predict(df, inputs_folder, ai_folder):
 	    config = yaml.load(stream)
 	df['age'] = config['age_multiplier'] * df['age']
 
-	hours_info  = util.util.read_coll(ai_folder + '/hours_info.json')
+	hours_info  = util.read_coll(ai_folder + '/hours_info.json')
 	df['hours-per-week'] = df['hours-per-week'] - hours_info['min']
 	df['hours-per-week'] = df['hours-per-week'] / (hours_info['max'] - hours_info['min'])
 
@@ -79,7 +79,7 @@ def predict(df, inputs_folder, ai_folder):
 	print("Dumping predictions file.")
 	print("Predictions dist.")
 	print(pd.Series(test_predictions).describe())
-	util.util.write_coll(list(test_predictions), 'predictions_{}.json'.format(util.get_timestamp()))
+	util.write_coll(list(test_predictions), 'predictions_{}.json'.format(util.get_timestamp()))
 
 
 if __name__ == "__main__":
