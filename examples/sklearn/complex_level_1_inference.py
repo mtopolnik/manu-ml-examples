@@ -17,38 +17,17 @@ import util
 
 target_column = 'yearly-income'
 
-def read_csv(filename, has_header = True, sep = ','):
-	df = pd.read_csv(filename, header = 0 if has_header else None)
-	df.columns = [col.strip() for col in df.columns]
-	return df
-
-
-def feature_selection(df, target_column):
-	# Use data science to select the best features
-	# here we simply return static ones
-	return ['age', 'workclass', 'education', 'occupation', 'hours-per-week', 'native-country', 'mean_age']
-
-
-def write_coll(collection, filename):
-	with open(filename, 'w') as f:
-		f.write(json.dumps(collection, indent = 4))
-
-def read_coll(filename):
-	with open(filename, 'r') as f:
-		return json.load(f)
-
-
 def predict(df, inputs_folder, ai_folder):
 
 	# Seperate the target column
 	labels = None
 	if target_column in df.columns:
 		labels = df[target_column]
-		labels_dict = read_coll(ai_folder + '/labels_dict.json')
+		labels_dict = util.util.read_coll(ai_folder + '/labels_dict.json')
 		labels = labels.apply(lambda x: labels_dict[x])
 		df = df.drop(target_column, axis = 1)
 
-	cols = read_coll(ai_folder + '/input_column_names.json')
+	cols = util.util.read_coll(ai_folder + '/input_column_names.json')
 	
 	if sorted(cols) != sorted(list(df.columns)):
 		print(cols)
@@ -64,7 +43,7 @@ def predict(df, inputs_folder, ai_folder):
 	df = df.merge(occupation_stats, how = 'inner', on = 'occupation')
 
 	# select only he feature selection columns
-	feature_selected_columns = read_coll(ai_folder + '/selected_features.txt')
+	feature_selected_columns = util.util.read_coll(ai_folder + '/selected_features.txt')
 	df = df[feature_selected_columns]
 
 
@@ -77,7 +56,7 @@ def predict(df, inputs_folder, ai_folder):
 	    config = yaml.load(stream)
 	df['age'] = config['age_multiplier'] * df['age']
 
-	hours_info  = read_coll(ai_folder + '/hours_info.json')
+	hours_info  = util.util.read_coll(ai_folder + '/hours_info.json')
 	df['hours-per-week'] = df['hours-per-week'] - hours_info['min']
 	df['hours-per-week'] = df['hours-per-week'] / (hours_info['max'] - hours_info['min'])
 
@@ -100,7 +79,7 @@ def predict(df, inputs_folder, ai_folder):
 	print("Dumping predictions file.")
 	print("Predictions dist.")
 	print(pd.Series(test_predictions).describe())
-	write_coll(list(test_predictions), 'predictions_{}.json'.format(util.get_timestamp()))
+	util.util.write_coll(list(test_predictions), 'predictions_{}.json'.format(util.get_timestamp()))
 
 
 if __name__ == "__main__":
@@ -112,6 +91,6 @@ if __name__ == "__main__":
 	inputs_folder = sys.argv[2]
 	ai_folder = sys.argv[3]
 	
-	df = read_csv(filename)
+	df = util.read_csv(filename)
 	predict(df, inputs_folder, ai_folder)
 

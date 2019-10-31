@@ -14,18 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
 import util
 
-#datasets_dir = '../../datasets'
-
-#training_artifacts_dir = 'ai_config'
-
-#filename = os.path.join(datasets_dir, 'income.data.txt')
 target_column = 'yearly-income'
-
-def read_csv(filename, has_header = True, sep = ','):
-	df = pd.read_csv(filename, header = 0 if has_header else None)
-	df.columns = [col.strip() for col in df.columns]
-	return df
-
 
 def feature_selection(df, target_column):
 	# Use data science to select the best features
@@ -33,13 +22,6 @@ def feature_selection(df, target_column):
 	return ['age', 'workclass', 'education', 'occupation', 'hours-per-week', 'native-country', 'mean_age']
 
 
-def write_coll(collection, filename):
-	with open(filename, 'w') as f:
-		f.write(json.dumps(collection, indent = 4))
-
-def read_coll(filename):
-	with open(filename, 'r') as f:
-		return json.load(f)
 
 
 def train_model_simple(df, inputs_folder, outputs_folder):
@@ -62,7 +44,7 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	# table but we assume a CSV for simplicty. If it came
 	# from a dataset for example it could be a complex query
 	# occupation_stats = pd.read_sql(some uber complex query)
-	occupation_stats = pd.read_csv(inputs_folder + '/occupation_stats.csv')
+	occupation_stats = util.read_csv(inputs_folder + '/occupation_stats.csv')
 
 	# join with the training data
 	df = df_train.merge(occupation_stats, how = 'inner', on = 'occupation')
@@ -145,6 +127,6 @@ if __name__ == "__main__":
 	inputs_folder = sys.argv[2]
 	outputs_folder = sys.argv[3]
 	
-	df = read_csv(filename)
+	df = util.read_csv(filename)
 	train_model_simple(df, inputs_folder, outputs_folder)
 
