@@ -117,6 +117,8 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	with open(outputs_folder + '/onehot.model', 'wb') as f:
 		pickle.dump(encoder, f)
 
+	print("Exiting. Models and other files output are in location: ", outputs_folder)
+
 
 if __name__ == "__main__":
 	if len(sys.argv) != 4:

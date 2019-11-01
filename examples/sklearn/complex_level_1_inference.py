@@ -76,10 +76,12 @@ def predict(df, inputs_folder, ai_folder):
 	if labels is not None:
 		print("Auc on testing data is ", util.auc(labels, test_predictions, model.classes_[1]))
 
-	print("Dumping predictions file.")
-	print("Predictions dist.")
+	print("Predictions distribution.")
 	print(pd.Series(test_predictions).describe())
-	util.write_coll(list(test_predictions), 'predictions_{}.json'.format(util.get_timestamp()))
+	
+	predictions_file = 'predictions_{}.json'.format(util.get_timestamp())
+	print("Dumping predictions file to ", predictions_file)
+	util.write_coll(list(test_predictions), predictions_file)
 
 
 if __name__ == "__main__":
