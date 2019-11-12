@@ -2,3 +2,4 @@
 *.pyc
 .env
 .vscode
+examples/sklearn/outputs1
