@@ -6,13 +6,14 @@ import datetime
 import json
 import yaml
 import sys
+import util
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
-import util
+
 
 target_column = 'yearly-income'
 
@@ -22,15 +23,13 @@ def feature_selection(df, target_column):
 	return ['age', 'workclass', 'education', 'occupation', 'hours-per-week', 'native-country', 'mean_age']
 
 
-
-
 def train_model_simple(df, inputs_folder, outputs_folder):
 	if os.path.exists(outputs_folder):
 		raise ValueError("Output path exists.")
 
 	os.mkdir(outputs_folder)
 
-	# Seperate the target column
+	# Separate the target column
 	df_train = df.drop(target_column, axis = 1)
 	util.write_coll(list(df_train.columns), outputs_folder + '/input_column_names.json')
 	labels = df[target_column]
@@ -70,7 +69,7 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	# Now let's do some 'feature engineering' i.e. the data science
 	# process of adding new features to the data (usually based on the
 	# data scientists intuition about the problem).
-	# 
+	#
 	# In this case we will add some aggregate statistics as a column
 	# in the training data. Since aggregate statistics are NOT available
 	# during testing time (testing assumes 1 row at a time for example)
@@ -82,14 +81,14 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	inter_1.to_csv(outputs_folder + '/education_mean.csv', index = False)
 	df = df.merge(inter_1, on = 'education')
 
-	# now may we read some control variables from a yaml file
+	# now we may read some control variables from a yaml file
 	with open(inputs_folder + '/ai-config.yml', 'r') as stream:
 	    config = yaml.load(stream)
 	df['age'] = config['age_multiplier'] * df['age']
 
 	hours_info = df['hours-per-week'].describe().to_dict()
 	util.write_coll(hours_info, outputs_folder + '/hours_info.json')
-	
+
 	df['hours-per-week'] = df['hours-per-week'] - hours_info['min']
 	df['hours-per-week'] = df['hours-per-week'] / (hours_info['max'] - hours_info['min'])
 
@@ -102,6 +101,7 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	encoder = enc_obj.fit(df)
 	x_train_encoded = encoder.transform(df)
 
+	print('Training the model')
 	# we are not going to tune any hyper-parameters
 	rf = RandomForestClassifier(n_estimators = 30, n_jobs = -1)  # -1 uses all cores...
 	model = rf.fit(x_train_encoded, labels)
@@ -117,7 +117,7 @@ def train_model_simple(df, inputs_folder, outputs_folder):
 	with open(outputs_folder + '/onehot.model', 'wb') as f:
 		pickle.dump(encoder, f)
 
-	print("Exiting. Models and other files output are in location: ", outputs_folder)
+	print("Done. Models and other files output are in location: ", outputs_folder)
 
 
 if __name__ == "__main__":
@@ -128,7 +128,7 @@ if __name__ == "__main__":
 	filename = sys.argv[1]
 	inputs_folder = sys.argv[2]
 	outputs_folder = sys.argv[3]
-	
+
 	df = util.read_csv(filename)
 	train_model_simple(df, inputs_folder, outputs_folder)
 

@@ -28,7 +28,7 @@ def predict(df, inputs_folder, ai_folder):
 		df = df.drop(target_column, axis = 1)
 
 	cols = util.read_coll(ai_folder + '/input_column_names.json')
-	
+
 	if sorted(cols) != sorted(list(df.columns)):
 		print(cols)
 		print(list(df.columns))
@@ -42,10 +42,9 @@ def predict(df, inputs_folder, ai_folder):
 	# join with the training data
 	df = df.merge(occupation_stats, how = 'inner', on = 'occupation')
 
-	# select only he feature selection columns
+	# select only the feature selection columns
 	feature_selected_columns = util.read_coll(ai_folder + '/selected_features.txt')
 	df = df[feature_selected_columns]
-
 
 	# add feature engineered columns
 	inter_1 = pd.read_csv(ai_folder + '/education_mean.csv')
@@ -71,14 +70,14 @@ def predict(df, inputs_folder, ai_folder):
 		model = pickle.load(f)
 
 	# get training accuracy
-	test_predictions = model.predict_proba(x_test_encoded).transpose()[1] # get predicstions for label 1
+	test_predictions = model.predict_proba(x_test_encoded).transpose()[1] # get predictions for label 1
 
 	if labels is not None:
 		print("Auc on testing data is ", util.auc(labels, test_predictions, model.classes_[1]))
 
 	print("Predictions distribution.")
 	print(pd.Series(test_predictions).describe())
-	
+
 	predictions_file = 'predictions_{}.json'.format(util.get_timestamp())
 	print("Dumping predictions file to ", predictions_file)
 	util.write_coll(list(test_predictions), predictions_file)
@@ -92,7 +91,7 @@ if __name__ == "__main__":
 	filename = sys.argv[1]
 	inputs_folder = sys.argv[2]
 	ai_folder = sys.argv[3]
-	
+
 	df = util.read_csv(filename)
 	predict(df, inputs_folder, ai_folder)
 

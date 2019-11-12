@@ -21,8 +21,6 @@ def read_coll(filename):
 	with open(filename, 'r') as f:
 		return json.load(f)
 
-
-
 def get_timestamp():
 	return datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
