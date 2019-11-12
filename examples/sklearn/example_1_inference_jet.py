@@ -24,7 +24,7 @@ occupation_stats = pd.read_csv(inputs_folder + '/occupation_stats.csv')
 feature_selected_columns = read_coll(ai_folder + '/selected_features.txt')
 inter_1 = pd.read_csv(ai_folder + '/education_mean.csv')
 with open(inputs_folder + '/ai-config.yml', 'r') as stream:
-    config = yaml.load(stream)
+    config = yaml.load(stream, Loader=yaml.SafeLoader)
 hours_info = read_coll(ai_folder + '/hours_info.json')
 with open(ai_folder + '/onehot.model', 'rb') as f:
     encoder = pickle.load(f)
