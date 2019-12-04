@@ -4,5 +4,3 @@ datetime
 flask
 flask_restful
 pyyaml
-grpcio
-protobuf
