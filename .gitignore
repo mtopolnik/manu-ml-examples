@@ -3,3 +3,6 @@
 .env
 .vscode
 examples/sklearn/outputs1
+datasets/lending.tgz
+datasets/metadata.csv
+datasets/streaming.csv
