@@ -21,7 +21,7 @@ with open(ai_folder + '/rf.model', 'rb') as f:
     model = pickle.load(f)
 
 
-def handle(input_json_list):
+def transform_list(input_json_list):
     row_dicts = [json.loads(input_json) for input_json in input_json_list]
     df = pd.DataFrame(row_dicts)
     df = df.merge(occupation_stats, how='inner', on='occupation')
