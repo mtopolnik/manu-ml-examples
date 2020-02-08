@@ -6,3 +6,11 @@ examples/sklearn/outputs1
 datasets/lending.tgz
 datasets/metadata.csv
 datasets/streaming.csv
+examples/pipeline2/stage1/models/
+examples/pipeline2/stage1/outputs.json
+examples/pipeline2/stage2/outputs.json
+examples/pipeline2/stage3/spark/models
+examples/pipeline2/stage3/spark/outputs.json
+examples/pipeline2/stage3/xgboost/models
+examples/pipeline2/stage3/xgboost/outputs.json
+examples/pipeline2/xgboost/
