@@ -1,50 +1,38 @@
 #include "xgboost/c_api.h"
-//#include "xgboost/data.h"
-
 #include <iostream>
 #include <stdio.h>
-
+#include <cassert>
 #include <iterator>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <string>
+#include <pthread.h>
 
 
-void predict(
-	DMatrixHandle* dtest,
+pthread_mutex_t predict_mutex;
+
+const float * predict(
+	float* data,
 	BoosterHandle* model, 
 	int num_rows, 
-	int num_cols, 
-	const float* result) {
-	//dtest = (DMatrix*) dtest;
-	//std::cout << "Info:\n" << dtest->Info() << "\n";
-	bst_ulong rows, columns;
-	XGDMatrixNumRow(*dtest, &rows);
-	std::cout << "Num rows in dataset: " << rows << "\n";
-	XGDMatrixNumCol(*dtest, &columns);
-	std::cout << "Num cols in dataset: " << columns << "\n";
-	
+	int num_cols) {
+
 	std::cout << "Converting to DMatrix\n";
-
-	//std::cout << dtest[0];
-	//XGDMatrixCreateFromMat(rows,
-    //                     num_rows, num_cols, NULL, &dtest);
+	DMatrixHandle dtest;
+	XGDMatrixCreateFromMat(data, num_rows, num_cols, 0, &dtest);
+  	
   	// predict
+  	std::cout << "Calling predict.";
 	bst_ulong out_len;
-	std::cout << "Here 1\n";
-	
-	//const float *f;
-	XGBoosterPredict(*model, *dtest, 0, 0, &out_len, &result);
-
-	std::cout << "here 2\n";
-	// assert(out_len == num_rows);
-	std::cout << result[0] << std::endl;
-	for (int i = 0; i < rows; i++) {
-		std::cout << "Result " << i << " " << result[i] << " \n";
-	}
-
+	const float * result;
+	pthread_mutex_lock(&predict_mutex);
+	XGBoosterPredict(*model, dtest, 0, 0, &out_len, &result);  // This method is not thread safe.
+	pthread_mutex_unlock(&predict_mutex);
+	std::cout << "Finished predict.";
+	assert(out_len == num_rows);
+	return result;
 }
 
 void read_data(const char* filepath, std::vector<std::vector<float> >& result) {
@@ -82,47 +70,39 @@ void tomatrix(std::string input) {
 
 
 int main() {
-	const char *csv_path = "outputs.csv?format=csv";
+	const char *csv_path = "outputs.csv";
 	const char *model_path = "models/xgboost.model";
 	BoosterHandle booster;
 
 	// LOAD MODEL
-
-	// create booster handle first
+	std::cout << "Loading model.\n";
 	XGBoosterCreate(NULL, 0, &booster);
-
-	// by default, the seed will be set 0
-	XGBoosterSetParam(booster, "seed", "0");
-      
-	// load model
+	XGBoosterSetParam(booster, "seed", "0");  
 	XGBoosterLoadModel(booster, model_path);
-	printf("Loaded model.\n");
+	std::cout << "Loaded model.\n";
 
-	printf("Loading data from x++ model.\n");
-	DMatrixHandle dmatrix;
-	int ret_val = XGDMatrixCreateFromFile(csv_path, 0, &dmatrix);
-	std::cout << "Matrix load status: " << ret_val << "\n";
-	// LOAD CSV DATA
-	std::vector<std::vector<float> > data;
 	std::cout << "Reading data.\n";
-	//read_data(csv_path, data);
-	std::cout << "Finished data.\n";
+	std::vector<std::vector<float> > data;
+	read_data(csv_path, data);
+	std::cout << "Finished reading data. Size: rows : " << data.size() << " Columns : " << data.at(0).size() << "\n";
 	
-	//float matrix[data.size()][data.at(0).size()];
-	//printf("Converting to matrix\n");
-	
-	//for (int i = 0; i < data.size(); i++) {
-	//	std::copy(data.at(i).begin(), data.at(i).end(), matrix[i]);
-	//}
-	
-	const float * result;
-	
-	printf("Calling predict.\n");
+	printf("Converting to array\n");
+	int rows = data.size();
+	int columns = data.at(0).size();
+	float matrix[rows][columns];
 
-	predict(&dmatrix, &booster, 0,0, result);
+	for (int i = 0; i < rows; i++) {
+		std::copy(data.at(i).begin(), data.at(i).end(), matrix[i]);
+	}
 	
-	printf("Finished predicting \n");
-
+	const float * result = predict((float *)matrix, &booster, rows, columns);
+	
+	// PRINT RESULTS
+	std::cout << "Predictions : [" << result[0];
+	for (int i = 1; i < rows; i++) {
+		std::cout << "," << result[i];
+	}
+	std::cout << "]\n";
 	XGBoosterFree(booster);
 	return 0;
 
