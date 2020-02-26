@@ -53,6 +53,7 @@ def main():
 
 	new_df = ohe.transform(df)
 	new_df.to_csv(outputs, index = False, header = False)
+	print("Writing pre-processed test data to ", outputs)
 	
 
 

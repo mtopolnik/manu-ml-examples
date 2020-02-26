@@ -45,3 +45,22 @@ ls models/
 # inference
 python inference.py models
 head outputs.json
+
+
+# xgboost cpp
+echo "***** Running stage 3: XGBoost CPP"
+cd ../xgboost_cpp
+rm -rf models
+python train.py models
+ls models/
+
+# inference
+make clean all
+# load the python models and dump a numeric only matrix that feeds into the ML model
+python preprocess_test_data.py models  
+head -n1 outputs.csv
+
+# predict on outputs.csv
+./predict
+
+

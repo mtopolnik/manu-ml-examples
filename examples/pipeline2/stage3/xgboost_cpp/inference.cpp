@@ -28,7 +28,7 @@ const float * predict(
 	bst_ulong out_len;
 	const float * result;
 	pthread_mutex_lock(&predict_mutex);
-	XGBoosterPredict(*model, dtest, 0, 0, &out_len, &result);  // This method is not thread safe.
+	XGBoosterPredict(*model, dtest, 0, 0, 0, &out_len, &result);  // This method is not thread safe.
 	pthread_mutex_unlock(&predict_mutex);
 	std::cout << "Finished predict.";
 	assert(out_len == num_rows);
