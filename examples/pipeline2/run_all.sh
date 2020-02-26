@@ -52,15 +52,19 @@ echo "***** Running stage 3: XGBoost CPP"
 cd ../xgboost_cpp
 rm -rf models
 python train.py models
-ls models/
+ls models/  # should contain onehot encoded model and xgboost model
 
 # inference
-make clean all
+# Data preprocessing is in python, would have been cumbersome to write in C++.
 # load the python models and dump a numeric only matrix that feeds into the ML model
+# This basically does reads the one-hot-encoding model dumped into the 'models'
+# folder above during the training phase, and then applies it to the data output
+# in stage 2 to dump outputs.csv which is a numeric only matrix 
 python preprocess_test_data.py models  
 head -n1 outputs.csv
 
-# predict on outputs.csv
+# predict on outputs.csv using the C++ Xgboost inteface. Model is the same as dumped by train.py
+make clean all
 ./predict
 
 
