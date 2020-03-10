@@ -1,6 +1,7 @@
 #!/bin/bash
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost
+rm -rf build
 mkdir build
 cd build
 # the default compiler on my system is fine.
