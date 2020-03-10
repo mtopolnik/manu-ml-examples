@@ -4,9 +4,9 @@ cd xgboost
 mkdir build
 cd build
 # the default compiler on my system is fine.
-cmake -DUSE_OPENMP=OFF ..
-cd ..
-sed -i .bak 's/USE_OPENMP = 1/USE_OPENMP = 0/' make/config.mk
+# Needs to libomp on OSX "brew install libomp"
+cmake -DBUILD_STATIC_LIB=ON ..
 make -j2
+cd ..
 cd python-package/
 python setup.py install
