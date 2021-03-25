@@ -3,7 +3,7 @@ scikit-learn==0.23.2
 DateTime==4.3
 Flask==1.1.2
 Flask-RESTful==0.3.8
-PyYAML==5.3.1
+PyYAML==5.4
 ## The following requirements were added by pip freeze:
 aniso8601==8.0.0
 click==7.1.2
